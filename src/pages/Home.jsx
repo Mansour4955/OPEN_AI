@@ -17,7 +17,11 @@ import {
   MdOutlineArrowForwardIos,
 } from "react-icons/md";
 import Chat from "../components/Chat";
+import axios from "axios";
+import { useSelector } from "react-redux";
 const Home = () => {
+  const { lang } = useSelector((state) => state.options);
+  const { mode } = useSelector((state) => state.themode);
   const [userQuestion, setUserQuestion] = useState("");
   const [open, setOpen] = useState(false);
   const [openSide, setOpenSide] = useState(true);
@@ -27,7 +31,10 @@ const Home = () => {
   const [clickedQuestions, setClickedQuestions] = useState([]);
   const [activeChat, setActiveChat] = useState(null); // Define the activeChat state
   const [isHovered, setIsHovered] = useState(false);
-
+  const [theme, setTheme] = useState(mode);
+  useEffect(() => {
+    setTheme(mode);
+  }, [mode]);
   // Function to handle mouse enter event
   const handleMouseEnter = () => {
     setIsHovered(true);
@@ -39,31 +46,45 @@ const Home = () => {
       setIsHovered(false);
     }, 5000);
   };
-  const openAI = {
-    ask: async (question) => {
-      // Placeholder for sending question to OpenAI and receiving response
-      return "Placeholder response for question: " + question;
-    },
-  };
+  // const openAI = {
+  //   ask: async (question) => {
+  //     // Placeholder for sending question to OpenAI and receiving response
+  //     return "Placeholder response for question: " + question;
+  //   },
+  // };
 
-  const handleQuestionClick = async (question) => {
-    try {
-      if (!clickedQuestions.includes(question)) {
-        const response = await openAI.ask(question); // Placeholder for asking question to OpenAI
+  const handleQuestionClick = (question) => {
+    setConversation((prevConversation) => [
+      ...prevConversation,
+      { type: "user", text: question },
+    ]);
+
+    const postData = {
+      question: question,
+      language: lang,
+      conversationId: "bcdde811-fcd3-48c5-a9ff-95e71ac9516f",
+    };
+    axios
+      .post("http://localhost:5264/API/Question", postData, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((res) => {
+        console.log(res.data.result);
         setConversation((prevConversation) => [
           ...prevConversation,
-          { type: "user", text: question },
-          { type: "ai", text: response },
+          {
+            type: "ai",
+            text: res.data.result.answer.answerContent,
+          },
         ]);
-        setAnswers((prevAnswers) => ({
-          ...prevAnswers,
-          [question]: response,
-        }));
-        setClickedQuestions(questions); // Mark all questions as clicked
-      }
-    } catch (error) {
-      console.error("Error fetching answer:", error);
-    }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    setClickedQuestions(questions); // Mark all questions as clicked
   };
 
   const handleUserQuestionChange = (e) => {
@@ -74,36 +95,71 @@ const Home = () => {
   const handleSubmit = async () => {
     // Check if there's an active chat
     if (activeChat) {
-      // Add user's question to the active chat's messages
-      activeChat.messages.push({ type: "user", text: userQuestion });
+      setActiveChat((prev) => ({
+        ...prev,
+        messages: [...prev.messages, { type: "user", text: userQuestion }],
+      }));
 
-      try {
-        // Fetch response from OpenAI
-        const response = await openAI.ask(userQuestion);
+      const postData = {
+        question: userQuestion,
+        language: lang,
+        conversationId: "bcdde811-fcd3-48c5-a9ff-95e71ac9516f",
+      };
+      axios
+        .post("http://localhost:5264/API/Question", postData, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+        .then((res) => {
+          console.log(res.data.result);
 
-        // Add AI's response to the active chat's messages
-        activeChat.messages.push({ type: "ai", text: response });
-
-        // Update conversation state
-        setConversation([
-          ...conversation,
-          { type: "user", text: userQuestion },
-          { type: "ai", text: response },
-        ]);
-      } catch (error) {
-        console.error("Error fetching answer:", error);
-      }
+          setActiveChat((prev) => ({
+            ...prev,
+            messages: [
+              ...prev.messages,
+              {
+                type: "ai",
+                text: res.data.result.answer.answerContent,
+              },
+            ],
+          }));
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     } else {
-      // If there's no active chat, simply add the user's question to the conversation
-      //   setConversation([...conversation, { type: "user", text: userQuestion }]);
-      const response = await openAI.ask(userQuestion);
-      setConversation([
+      setConversation((conversation) => [
         ...conversation,
         { type: "user", text: userQuestion },
-        { type: "ai", text: response },
       ]);
-    }
 
+      const postData = {
+        question: userQuestion,
+        language: lang,
+        conversationId: "bcdde811-fcd3-48c5-a9ff-95e71ac9516f",
+      };
+      axios
+        .post("http://localhost:5264/API/Question", postData, {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        })
+        .then((res) => {
+          console.log(res.data.result);
+          // question.questionContent
+          //answer.answerContent
+          setConversation((conversation) => [
+            ...conversation,
+            { type: "ai", text: res.data.result.answer.answerContent },
+          ]);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
     // Clear user input
     setUserQuestion("");
 
@@ -149,23 +205,24 @@ const Home = () => {
   };
   return (
     <div
-      style={{
-        backgroundImage: `url(${backgroundImage})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-      className="flex flex-col "
+      className={`${theme === "light" ? "bg-white" : "bg-black"} flex flex-col z-40`}
     >
-      <div className="flex transition-all duration-200 h-[92.5vh] bg-blue-950/90">
+      <div
+        className={`flex transition-all duration-200 h-[92.5vh] ${
+          theme === "light" ? "bg-white" : "bg-black"
+        }`}
+      >
         <div
           className={`${
             !openSide ? "w-[0%]" : "w-[20%] h-[92.5vh]  px-1"
-          }  flex relative flex-col gap-4  transition-all duration-200 bg-blue-950/60`}
+          }  flex relative flex-col gap-4  transition-all duration-200 ${
+            theme === "light" ? "bg-[#808080]/70" : "bg-[#808080]/70"
+          }`}
         >
           <p
             className={`${
               !openSide && "hidden"
-            } text-2xl text-white p-2 font-bold`}
+            } text-2xl p-2 font-semibold ${theme === "light" ? "text-white" : "text-white"}`}
           >
             Last chats
           </p>
@@ -190,7 +247,7 @@ const Home = () => {
                   setOpenSide(!openSide);
                   setOpen(false);
                 }}
-                className="text-blue-600 cursor-pointer"
+                className="text-[#808080] cursor-pointer"
               >
                 <MdOutlineArrowForwardIos size={22} />
               </span>
@@ -200,7 +257,7 @@ const Home = () => {
                   setOpenSide(!openSide);
                   setOpen(true);
                 }}
-                className="text-blue-600 cursor-pointer"
+                className="text-[#808080] cursor-pointer"
               >
                 <MdOutlineArrowBackIosNew size={22} />
               </span>
@@ -241,7 +298,12 @@ const Home = () => {
               </div>
             )}
 
-            <Chat activeChat={activeChat} setActiveChat={setActiveChat} setConversation={setConversation} conversation={conversation} />
+            <Chat
+              activeChat={activeChat}
+              setActiveChat={setActiveChat}
+              setConversation={setConversation}
+              conversation={conversation}
+            />
           </div>
 
           <div className="mx-auto flex gap-2 w-[80%]">
@@ -251,39 +313,39 @@ const Home = () => {
               onMouseLeave={handleMouseLeave}
               className={`${
                 !isHovered ? "w-[50px] px-2 py-1" : "w-[170px] p-2 gap-1"
-              }  cursor-pointer duration-200 transition-all flex justify-center items-center h-fit rounded-lg  bg-blue-600`}
+              }  cursor-pointer duration-200 transition-all flex justify-center items-center h-fit rounded-lg  bg-[#808080]`}
             >
               <span className="relative text-white">
                 <BsFillChatFill size={36} />
-                <span className="absolute right-1 bottom-1 text-blue-600 font-semibold text-xl">
+                <span className="absolute right-1 bottom-1 text-[#808080] font-semibold text-xl">
                   +
                 </span>
               </span>
               <span
                 className={`${
                   isHovered ? "flex" : "hidden"
-                }whitespace-nowrap overflow-x-hidden text-gray-200 font-semibold`}
+                }whitespace-nowrap overflow-x-hidden  font-semibold ${theme === "light" ? "text-white": "text-white"}`}
               >
                 New Chat
               </span>
             </div>
             <div className=" w-full ">
-              <div className="flex">
+              <div className="flex relative">
                 <textarea
                   rows={4}
                   type="text"
-                  className="caret-white  bg-transparent flex-1 border-[2px] text-white font-medium  border-blue-600 rounded-xl px-2 outline-none py-3"
+                  className={`${theme === "light" ? "text-black caret-black": "text-white caret-white"} bg-transparent flex-1 border-[2px] font-medium  border-[#808080] rounded-xl px-2 outline-none py-3`}
                   placeholder="Ask Azul AI"
                   value={userQuestion}
                   onChange={handleUserQuestionChange}
                   onKeyDown={handleKeyDown}
                 />
-                {/* <div
+                <div
                   onClick={handleSubmit}
-                  className="bg-white hover:text-white active:bg-white active:text-blue-600 flex items-center justify-center rounded-r-xl border border-blue-600 border-l-0 px-2 py-1 text-blue-600 font-bold cursor-pointer hover:bg-blue-600 duration-300"
+                  className="bg-[#808080] absolute top-2 right-2 hover:bg-gray-500 flex items-center justify-center rounded-lg px-2 py-1 text-white font-bold cursor-pointer duration-300"
                 >
                   <IoIosSend size={20} />
-                </div> */}
+                </div>
               </div>
             </div>
           </div>

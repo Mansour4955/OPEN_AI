@@ -10,6 +10,7 @@ import MyChats from "./pages/MyChats";
 
 function App() {
   return (
+    
     <div className="bg-white h-screen ">
       <BrowserRouter>
         <Header />

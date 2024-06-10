@@ -4,17 +4,21 @@ import logo from "../images/artificial-intelligence.png";
 import { IoPersonCircleOutline } from "react-icons/io5";
 import { RxCopy, RxReload } from "react-icons/rx";
 import { PiCopySimpleFill, PiCopySimpleLight } from "react-icons/pi";
+import axios from "axios";
+import { useSelector } from "react-redux";
 const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
   const [fill, setFill] = useState(false);
+  const [reload, setReload] = useState(false);
+  const { lang } = useSelector((state) => state.options);
   const bottomRef = useRef(null);
 
   useEffect(() => {
     // Scroll to bottom when component mounts or updates
     bottomRef.current.scrollIntoView({ behavior: "smooth" });
   }, [activeChat, conversation]);
-  const fetchNewResponseFromAI = async (lastUserMessageText) => {
-    return lastUserMessageText + " " + "ANOTHER ANSWER";
-  };
+  // const fetchNewResponseFromAI = async (lastUserMessageText) => {
+  //   return lastUserMessageText + " " + "ANOTHER ANSWER";
+  // };
   const handleCopyActiveChat = (text) => {
     // Function to copy the text
     navigator.clipboard.writeText(text);
@@ -26,28 +30,45 @@ const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
   };
 
   const handleReloadActiveChat = () => {
+    setReload(true);
+    let userQuestion;
     const theLastUserMessage = activeChat.messages.filter(
       (msg) => msg.type === "user"
     );
     const lastUserMessage = theLastUserMessage[theLastUserMessage.length - 1];
     if (lastUserMessage) {
-      const lastUserMessageText = lastUserMessage.text;
-      // Assuming you have a function to fetch a new response from the AI
-      fetchNewResponseFromAI(lastUserMessageText)
-        .then((newResponse) => {
-          // Add the new AI response to the conversation
-          setActiveChat((prevActiveChat) => ({
-            ...prevActiveChat,
-            messages: [
-              ...prevActiveChat.messages,
-              { type: "ai", text: newResponse },
-            ],
-          }));
-        })
-        .catch((error) => {
-          console.error("Error fetching new response:", error);
-        });
+      userQuestion = lastUserMessage.text;
     }
+    const postData = {
+      question: userQuestion,
+      language: lang,
+      conversationId: "bcdde811-fcd3-48c5-a9ff-95e71ac9516f",
+    };
+
+    axios
+      .post("http://localhost:5264/API/Question", postData, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((res) => {
+        console.log(res.data.result);
+        setReload(false);
+        setActiveChat((prev) => ({
+          ...prev,
+          messages: [
+            ...prev.messages,
+            {
+              type: "ai",
+              text: res.data.result.answer.answerContent,
+            },
+          ],
+        }));
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const handleCopyConversation = (text) => {
@@ -61,23 +82,41 @@ const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
   };
 
   const handleReloadConversation = () => {
-    const theLastUserMessage = conversation.filter((msg) => msg.type === "user");
+    setReload(true);
+    let userQuestion;
+    const theLastUserMessage = conversation.filter(
+      (msg) => msg.type === "user"
+    );
     const lastUserMessage = theLastUserMessage[theLastUserMessage.length - 1];
     if (lastUserMessage) {
-      const lastUserMessageText = lastUserMessage.text;
-      // Assuming you have a function to fetch a new response from the AI
-      fetchNewResponseFromAI(lastUserMessageText)
-        .then((newResponse) => {
-          // Add the new AI response to the conversation
-          setConversation((prev) => [
-            ...prev,
-            { type: "ai", text: newResponse },
-          ]);
-        })
-        .catch((error) => {
-          console.error("Error fetching new response:", error);
-        });
+      userQuestion = lastUserMessage.text;
     }
+
+    const postData = {
+      question: userQuestion,
+      language: lang,
+      conversationId: "bcdde811-fcd3-48c5-a9ff-95e71ac9516f",
+    };
+    axios
+      .post("http://localhost:5264/API/Question", postData, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      })
+      .then((res) => {
+        console.log(res.data.result);
+        // question.questionContent
+        //answer.answerContent
+        setReload(false);
+        setConversation((conversation) => [
+          ...conversation,
+          { type: "ai", text: res.data.result.answer.answerContent },
+        ]);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
   return (
     <div className="mb-4 w-full max-w-full">
@@ -126,7 +165,9 @@ const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
                       </span>
                       <span
                         onClick={handleReloadActiveChat}
-                        className="cursor-pointer"
+                        className={`${
+                          reload ? "animate-spin" : ""
+                        } cursor-pointer`}
                       >
                         <RxReload />
                       </span>
@@ -177,7 +218,9 @@ const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
                     </span>
                     <span
                       onClick={handleReloadConversation}
-                      className="cursor-pointer"
+                      className={`${
+                        reload ? "animate-spin" : ""
+                      } cursor-pointer`}
                     >
                       <RxReload />
                     </span>
