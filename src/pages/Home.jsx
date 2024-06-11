@@ -319,26 +319,29 @@ const Home = () => {
           <header
             className={`${
               clickedQuestions === questions ? "hidden" : "flex"
-            } text-4xl text-blue-600 font-bold mb-4  items-center gap-1`}
+            } text-4xl text-blue-600 font-bold mb-4  items-center gap-1 absolute top-[200px] left-2/4 -translate-x-2/4`}
           >
             <img alt="logo" src={logo} className="w-9 h-9" />
-            <span className="flex items-center text-white">Ask Azul AI</span>
+            <span className="flex items-center text-[#808080] ">Ask Azul AI</span>
             <img alt="logo" src={logo} className="w-9 h-9" />
           </header>
 
           <div className="h-[70vh] max-h-[70vh] relative overflow-y-auto w-full">
             {clickedQuestions.length < 1 && (
-              <div className="w-[80%] mx-auto grid grid-cols-2 absolute bottom-10 left-2/4 -translate-x-2/4">
+              <div className="w-[80%] mx-auto grid grid-cols-2 gap-2 absolute bottom-20 left-2/4 -translate-x-2/4">
                 {/* <Slider {...settings} className="flex gap-5"> */}
                   {visibleQuestions.map((question, index) => (
                     <div
                       key={index}
                       onClick={() => handleQuestionClick(question)}
-                      className={` cursor-pointer active:text-white bg-blue-500 active:bg-blue-500 text-white hover:bg-blue-600  hover:text-white mb-2 col-span-1 duration-150 flex justify-center  border border-blue-500 rounded-lg text-2xl  px-4 py-2 slick-slide-custom w-[97%] max-w-[97%]`}
+                      className={`text-white cursor-pointer  col-span-1 duration-150 flex  bg-[#808080] rounded-lg   px-4 py-2 slick-slide-custom`}
                     >
-                      <label className=" text-lg  duration-150 font-medium flex justify-center cursor-pointer line-clamp-2">
+                     <div className="flex flex-col">
+                     <label className=" text-base  duration-150 font-medium flex cursor-pointer line-clamp-1">
                         {question}
                       </label>
+                      <p className="line-clamp-1">ssssssssssssssssssssssssss</p>
+                     </div>
                     </div>
                   ))}
                 {/* </Slider> */}
