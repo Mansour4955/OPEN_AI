@@ -6,12 +6,19 @@ import { RxCopy, RxReload } from "react-icons/rx";
 import { PiCopySimpleFill, PiCopySimpleLight } from "react-icons/pi";
 import axios from "axios";
 import { useSelector } from "react-redux";
+
 const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
+  
+  
   const [fill, setFill] = useState(false);
   const [reload, setReload] = useState(false);
   const { lang } = useSelector((state) => state.options);
+  const { mode } = useSelector((state) => state.themode);
+  const [theLight, setTheLight] = useState(mode);
   const bottomRef = useRef(null);
-
+  useEffect(() => {
+    setTheLight(mode);
+  }, [mode]);
   useEffect(() => {
     // Scroll to bottom when component mounts or updates
     bottomRef.current.scrollIntoView({ behavior: "smooth" });
@@ -127,23 +134,32 @@ const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
           {activeChat.messages.map((msg, index) => (
             <div
               key={index}
-              className={"text-white text-left p-2 rounded mb-2"}
+              className={"text-[#808080] text-left p-2 rounded mb-2"}
             >
               {msg.type === "user" ? (
-                <p className="font-bold flex flex-col">
+                <p className="font-bold flex flex-col text-lg">
                   <span className="flex gap-1 items-center">
-                    <IoPersonCircleOutline className="text-white" size={28} />{" "}
-                    You
+                    <IoPersonCircleOutline className="" size={28} /> You
                   </span>{" "}
-                  <span className="pl-2">{msg.text}</span>
+                  <span
+                    className={`${
+                      theLight === "light" ? "text-black" : "text-white"
+                    } pl-2 font-medium text-base`}
+                  >
+                    {msg.text}
+                  </span>
                 </p>
               ) : (
-                <p className="font-bold flex flex-col">
+                <p className="font-bold flex flex-col text-lg">
                   <span className="flex gap-1 items-center">
                     <img alt="logo" src={logo} className="w-9 h-9" />
                     Azul AI
                   </span>{" "}
-                  <span className="pl-2">
+                  <span
+                    className={`${
+                      theLight === "light" ? "text-black" : "text-white"
+                    } pl-2 font-medium text-base`}
+                  >
                     {activeChat.messages.length - 1 === index ? (
                       <Typewriter
                         text={msg.text}
@@ -159,7 +175,9 @@ const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
                     <span className="pl-2 flex items-center gap-1 mt-1">
                       <span
                         onClick={() => handleCopyActiveChat(msg.text)}
-                        className="cursor-pointer"
+                        className={`${
+                          theLight === "light" ? "text-black" : "text-white"
+                        } cursor-pointer`}
                       >
                         {!fill ? <PiCopySimpleLight /> : <PiCopySimpleFill />}
                       </span>
@@ -167,7 +185,9 @@ const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
                         onClick={handleReloadActiveChat}
                         className={`${
                           reload ? "animate-spin" : ""
-                        } cursor-pointer`}
+                        } cursor-pointer ${
+                          theLight === "light" ? "text-black" : "text-white"
+                        }`}
                       >
                         <RxReload />
                       </span>
@@ -184,23 +204,34 @@ const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
           <div
             key={index}
             className={
-              "text-white text-left bg-transparent p-2 rounded mb-2 max-w-[100%]"
+              "text-[#808080] text-left bg-transparent p-2 rounded mb-2 max-w-[100%]"
             }
           >
             {msg.type === "user" ? (
-              <p className="font-bold flex flex-col">
-                <span className="flex gap-1 items-center text-white">
-                  <IoPersonCircleOutline className="text-white" size={28} /> You
+              <p className="font-bold flex flex-col text-lg">
+                <span className="flex gap-1 items-center text-[#808080]">
+                  <IoPersonCircleOutline className="text-[#808080]" size={28} />{" "}
+                  You
                 </span>{" "}
-                <span className="pl-2 flex flex-wrap">{msg.text}</span>
+                <span
+                  className={`${
+                    theLight === "light" ? "text-black" : "text-white"
+                  } pl-2 flex flex-wrap font-medium text-base`}
+                >
+                  {msg.text}
+                </span>
               </p>
             ) : (
-              <p className="font-bold flex flex-col">
-                <span className="flex gap-1 items-center text-white">
+              <p className="font-bold flex flex-col text-lg">
+                <span className="flex gap-1 items-center text-[#808080]">
                   <img alt="logo" src={logo} className="w-9 h-9" />
                   Azul AI
                 </span>{" "}
-                <span className="pl-2 flex flex-wrap">
+                <span
+                  className={`${
+                    theLight === "light" ? "text-black" : "text-white"
+                  } pl-2 flex flex-wrap font-medium text-base`}
+                >
                   <Typewriter
                     text={msg.text}
                     typeSpeed={20}
@@ -212,7 +243,9 @@ const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
                   <span className="pl-2 flex items-center gap-1 mt-1">
                     <span
                       onClick={() => handleCopyConversation(msg.text)}
-                      className="cursor-pointer"
+                      className={`${
+                        theLight === "light" ? "text-black" : "text-white"
+                      } cursor-pointer`}
                     >
                       {!fill ? <PiCopySimpleLight /> : <PiCopySimpleFill />}
                     </span>
@@ -220,7 +253,9 @@ const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
                       onClick={handleReloadConversation}
                       className={`${
                         reload ? "animate-spin" : ""
-                      } cursor-pointer`}
+                      } cursor-pointer ${
+                        theLight === "light" ? "text-black" : "text-white"
+                      }`}
                     >
                       <RxReload />
                     </span>

@@ -11,7 +11,7 @@ import Slider from "react-slick";
 import ChatTitLe from "../components/ChatTitLe";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import backgroundImage from "../images/photomania-d6d420bf7b58b00b31ac130e0ed34f9e.jpg";
+
 import {
   MdOutlineArrowBackIosNew,
   MdOutlineArrowForwardIos,
@@ -20,7 +20,7 @@ import Chat from "../components/Chat";
 import axios from "axios";
 import { useSelector } from "react-redux";
 const Home = () => {
-  const { lang } = useSelector((state) => state.options);
+  const { lang, langUser } = useSelector((state) => state.options);
   const { mode } = useSelector((state) => state.themode);
   const [userQuestion, setUserQuestion] = useState("");
   const [open, setOpen] = useState(false);
@@ -32,6 +32,10 @@ const Home = () => {
   const [activeChat, setActiveChat] = useState(null); // Define the activeChat state
   const [isHovered, setIsHovered] = useState(false);
   const [theme, setTheme] = useState(mode);
+  const [theLang, setTheLang] = useState(langUser);
+  useEffect(() => {
+    setTheLang(langUser);
+  }, [langUser]);
   useEffect(() => {
     setTheme(mode);
   }, [mode]);
@@ -205,10 +209,14 @@ const Home = () => {
   };
   return (
     <div
-      className={`${theme === "light" ? "bg-white" : "bg-black"} flex flex-col z-40`}
+      className={`${
+        theme === "light" ? "bg-white" : "bg-black"
+      } flex flex-col z-40`}
     >
       <div
-        className={`flex transition-all duration-200 h-[92.5vh] ${
+        className={`${
+          theLang === "arabic" ? "flex-row-reverse" : ""
+        } flex transition-all duration-200 h-[92.5vh] ${
           theme === "light" ? "bg-white" : "bg-black"
         }`}
       >
@@ -220,11 +228,15 @@ const Home = () => {
           }`}
         >
           <p
-            className={`${
-              !openSide && "hidden"
-            } text-2xl p-2 font-semibold ${theme === "light" ? "text-white" : "text-white"}`}
+            className={`${!openSide && "hidden"} text-2xl p-2 font-semibold ${
+              theme === "light" ? "text-white" : "text-white"
+            } `}
           >
-            Last chats
+            {theLang === "english"
+              ? "Last chats"
+              : theLang === "french"
+              ? "dernières discussions"
+              : "المحداثات الأخيرة"}
           </p>
           <div
             className={`${
@@ -240,27 +252,64 @@ const Home = () => {
               </div>
             ))}
           </div>
-          <div className="h-full flex items-center  absolute -right-6">
-            {open ? (
-              <span
-                onClick={() => {
-                  setOpenSide(!openSide);
-                  setOpen(false);
-                }}
-                className="text-[#808080] cursor-pointer"
-              >
-                <MdOutlineArrowForwardIos size={22} />
-              </span>
-            ) : (
-              <span
-                onClick={() => {
-                  setOpenSide(!openSide);
-                  setOpen(true);
-                }}
-                className="text-[#808080] cursor-pointer"
-              >
-                <MdOutlineArrowBackIosNew size={22} />
-              </span>
+          <div
+            className={`h-full flex items-center  absolute ${
+              theLang === "arabic" ? "-left-6" : "-right-6"
+            }`}
+          >
+            {theLang !== "arabic" && (
+              <div>
+                {open ? (
+                 
+                  <span
+                    onClick={() => {
+                      setOpenSide(!openSide);
+                      setOpen(false);
+                    }}
+                    className="text-[#808080] cursor-pointer"
+                  >
+                    <MdOutlineArrowForwardIos size={22} />
+                  </span>
+                ) : (
+                  <span
+                  onClick={() => {
+                    setOpenSide(!openSide);
+                    setOpen(true);
+                    
+                    }}
+                    className="text-[#808080] cursor-pointer"
+                    >
+                    <MdOutlineArrowBackIosNew size={22} />
+                </span>
+                )}
+              </div>
+            )}
+
+            {theLang === "arabic" && (
+              <div>
+                {open ? (
+                  <span
+                    onClick={() => {
+                      setOpenSide(!openSide);
+                      setOpen(false);
+                    }}
+                    className="text-[#808080] cursor-pointer"
+                  >
+                    <MdOutlineArrowBackIosNew size={22} />
+                  </span>
+                ) : (
+                  <span
+                    onClick={() => {
+                      setOpenSide(!openSide);
+                      setOpen(true);
+                      
+                    }}
+                    className="text-[#808080] cursor-pointer"
+                  >
+                    <MdOutlineArrowForwardIos size={22} />
+                  </span>
+                )}
+              </div>
             )}
           </div>
         </div>
@@ -306,7 +355,7 @@ const Home = () => {
             />
           </div>
 
-          <div className="mx-auto flex gap-2 w-[80%]">
+          <div className="mx-auto flex gap-2 ltr w-[80%]">
             <div
               onClick={handleNewChat}
               onMouseEnter={handleMouseEnter}
@@ -324,7 +373,9 @@ const Home = () => {
               <span
                 className={`${
                   isHovered ? "flex" : "hidden"
-                }whitespace-nowrap overflow-x-hidden  font-semibold ${theme === "light" ? "text-white": "text-white"}`}
+                }whitespace-nowrap overflow-x-hidden  font-semibold ${
+                  theme === "light" ? "text-white" : "text-white"
+                }`}
               >
                 New Chat
               </span>
@@ -334,7 +385,11 @@ const Home = () => {
                 <textarea
                   rows={4}
                   type="text"
-                  className={`${theme === "light" ? "text-black caret-black": "text-white caret-white"} bg-transparent flex-1 border-[2px] font-medium  border-[#808080] rounded-xl px-2 outline-none py-3`}
+                  className={`${
+                    theme === "light"
+                      ? "text-black caret-black"
+                      : "text-white caret-white"
+                  } bg-transparent flex-1 border-[2px] font-medium  border-[#808080] rounded-xl px-2 outline-none py-3`}
                   placeholder="Ask Azul AI"
                   value={userQuestion}
                   onChange={handleUserQuestionChange}

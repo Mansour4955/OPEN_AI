@@ -16,12 +16,17 @@ function Header() {
 
   // const theTheme = getItem();
   const { mode } = useSelector((state) => state.themode);
+  const { langUser } = useSelector((state) => state.options);
+
   const [language, setLanguage] = useState("english");
-  const [theLang, setTheLang] = useState(false);
+  const [theLang, setTheLang] = useState(langUser);
   const [theLight, setTheLight] = useState(mode);
   const [showLangs, setShowLangs] = useState(false);
   const [formType, setFormType] = useState("Professional");
   const dispatch = useDispatch();
+  useEffect(() => {
+    setTheLang(langUser);
+  }, [langUser]);
   useEffect(() => {
     setTheLight(mode);
   }, [mode]);
@@ -40,40 +45,34 @@ function Header() {
   // };
   return (
     <div
-      className={`bg-[#808080] py-2 px-10 flex items-center justify-between gap-5 z-50 shadow-[rgba(0,_0,_0,_0.4)_0px_30px_90px]`}
+      className={`${
+        theLang === "arabic" ? "flex-row-reverse" : ""
+      } bg-[#808080] py-2 px-10 flex items-center justify-between gap-5 z-50 shadow-[rgba(0,_0,_0,_0.4)_0px_30px_90px]`}
     >
-      <div className="flex gap-3 px-2 items-center justify-center">
+      <div
+        className={`${
+          theLang === "arabic" ? "flex-row-reverse" : ""
+        } flex gap-3 px-2 items-center justify-center`}
+      >
         <Link
           to="/"
-          className="text-3xl font-bold text-blue-500 flex items-center gap-1"
+          className={`${
+            theLang === "arabic" ? "flex-row-reverse" : ""
+          } text-3xl font-bold text-blue-500 flex items-center gap-1`}
         >
           <img alt="uir" src={uir} className="h-10 w-10 rounded-full" />
-          <span className={`${theLight === "light" ? "text-white" : "text-black"}`}>AZUL</span>
+          <span
+            className={`${theLight === "light" ? "text-white" : "text-black"}`}
+          >
+            AZUL
+          </span>
         </Link>
-        {/* <NavLink
-          className={({ isActive }) =>
-            isActive
-              ? "font-semibold text-5 text-lg"
-              : "font-semibold  text-lg"
-          }
-          to="/"
-        >
-          Home
-        </NavLink>
-        <NavLink
-          className={({ isActive }) =>
-            isActive
-              ? "font-semibold text-5 text-lg "
-              : "font-semibold  text-lg"
-          }
-          to="/chats"
-        >
-          My Chats
-        </NavLink> */}
       </div>
-      <div className="flex relative gap-3 px-2 items-center justify-center">
-        {/* Language Selector Component */}
-
+      <div
+        className={`${
+          theLang === "arabic" ? "flex-row-reverse" : ""
+        } flex relative gap-3 px-2 items-center justify-center`}
+      >
         <span
           onClick={() => setShowLangs(!showLangs)}
           className={`${
@@ -90,7 +89,9 @@ function Header() {
         {showLangs && (
           <select
             className={`${
-              theLight === "light" ? "bg-black text-white" : "bg-white text-black"
+              theLight === "light"
+                ? "bg-black text-white"
+                : "bg-white text-black"
             } p-2 absolute top-[140%] rounded border font-semibold cursor-pointer outline-none`}
             value={language}
             onChange={(e) => handleLanguageChange(e.target.value)}
