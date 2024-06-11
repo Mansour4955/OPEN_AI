@@ -199,14 +199,14 @@ const Home = () => {
       handleSubmit();
     }
   };
-  const settings = {
-    dots: false,
-    autoplay: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 3,
-    slidesToScroll: 1,
-  };
+  // const settings = {
+  //   dots: false,
+  //   autoplay: true,
+  //   infinite: true,
+  //   speed: 500,
+  //   slidesToShow: 3,
+  //   slidesToScroll: 1,
+  // };
   return (
     <div
       className={`${
@@ -326,25 +326,24 @@ const Home = () => {
             <img alt="logo" src={logo} className="w-9 h-9" />
           </header>
 
-          <div className="h-[70vh] max-h-[70vh]  overflow-y-auto w-full">
+          <div className="h-[70vh] max-h-[70vh] relative overflow-y-auto w-full">
             {clickedQuestions.length < 1 && (
-              <div className="w-[80%] mx-auto">
-                <Slider {...settings} className="flex gap-5">
+              <div className="w-[80%] mx-auto grid grid-cols-2 absolute bottom-10 left-2/4 -translate-x-2/4">
+                {/* <Slider {...settings} className="flex gap-5"> */}
                   {visibleQuestions.map((question, index) => (
                     <div
                       key={index}
                       onClick={() => handleQuestionClick(question)}
-                      className={`mx-[1.5%] cursor-pointer active:text-white bg-blue-500 active:bg-blue-500 text-white hover:bg-blue-600  hover:text-white mb-2 col-span-1 duration-150 flex justify-center  border border-blue-500 rounded-lg text-2xl  px-4 py-2 slick-slide-custom w-[97%] max-w-[97%]`}
+                      className={` cursor-pointer active:text-white bg-blue-500 active:bg-blue-500 text-white hover:bg-blue-600  hover:text-white mb-2 col-span-1 duration-150 flex justify-center  border border-blue-500 rounded-lg text-2xl  px-4 py-2 slick-slide-custom w-[97%] max-w-[97%]`}
                     >
-                      <label className=" text-lg  duration-150 font-medium flex justify-center cursor-pointer">
+                      <label className=" text-lg  duration-150 font-medium flex justify-center cursor-pointer line-clamp-2">
                         {question}
                       </label>
                     </div>
                   ))}
-                </Slider>
+                {/* </Slider> */}
               </div>
             )}
-
             <Chat
               activeChat={activeChat}
               setActiveChat={setActiveChat}
@@ -352,7 +351,6 @@ const Home = () => {
               conversation={conversation}
             />
           </div>
-
           <div className="mx-auto flex gap-2 ltr w-[80%]">
             <div
               onClick={handleNewChat}
