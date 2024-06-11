@@ -221,7 +221,8 @@ const Home = () => {
         }`}
       >
         <div
-          className={`${
+          dir={theLang === "arabic" ? "rtl" : ""}
+          className={` ${
             !openSide ? "w-[0%]" : "w-[20%] h-[92.5vh]  px-1"
           }  flex relative flex-col gap-4  transition-all duration-200 ${
             theme === "light" ? "bg-[#808080]/70" : "bg-[#808080]/70"
@@ -260,7 +261,6 @@ const Home = () => {
             {theLang !== "arabic" && (
               <div>
                 {open ? (
-                 
                   <span
                     onClick={() => {
                       setOpenSide(!openSide);
@@ -272,15 +272,14 @@ const Home = () => {
                   </span>
                 ) : (
                   <span
-                  onClick={() => {
-                    setOpenSide(!openSide);
-                    setOpen(true);
-                    
+                    onClick={() => {
+                      setOpenSide(!openSide);
+                      setOpen(true);
                     }}
                     className="text-[#808080] cursor-pointer"
-                    >
+                  >
                     <MdOutlineArrowBackIosNew size={22} />
-                </span>
+                  </span>
                 )}
               </div>
             )}
@@ -302,7 +301,6 @@ const Home = () => {
                     onClick={() => {
                       setOpenSide(!openSide);
                       setOpen(true);
-                      
                     }}
                     className="text-[#808080] cursor-pointer"
                   >
