@@ -39,6 +39,9 @@ const Home = () => {
   const [theLang, setTheLang] = useState(langUser);
   const [showLangs, setShowLangs] = useState(false);
   const [theLoading, setTheLoading] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const [value, setValue] = useState();
+
   useEffect(() => {
     setLanguage(lang);
   }, [lang]);
@@ -66,6 +69,7 @@ const Home = () => {
 
   const handleQuestionClick = (question) => {
     setTheLoading(true);
+    setLoading(true);
     setConversation((prevConversation) => [
       ...prevConversation,
       { type: "user", text: question },
@@ -84,8 +88,9 @@ const Home = () => {
         },
       })
       .then((res) => {
+        setTyping(true)
         setLoading(false);
-        
+        setValue(res.data.result.answer.answerContent)
         console.log(res.data.result);
         setConversation((prevConversation) => [
           ...prevConversation,
@@ -129,8 +134,9 @@ const Home = () => {
           },
         })
         .then((res) => {
+          setTyping(true)
           setLoading(false);
-          
+          setValue(res.data.result.answer.answerContent)
           console.log(res.data.result);
 
           setActiveChat((prev) => ({
@@ -168,8 +174,9 @@ const Home = () => {
         })
         .then((res) => {
           console.log(res.data.result);
+          setTyping(true)
           setLoading(false);
-         
+          setValue(res.data.result.answer.answerContent)
           // question.questionContent
           //answer.answerContent
           setConversation((conversation) => [
@@ -383,6 +390,9 @@ const Home = () => {
               conversation={conversation}
               setTheLoading={setTheLoading}
               setLoading={setLoading}
+              setTyping={setTyping}
+              typing={typing}
+              value={value} setValue={setValue}
             />
           </div>
           <div className="mx-auto flex gap-2 ltr w-[80%]">
@@ -427,8 +437,8 @@ const Home = () => {
                   <select
                     className={`${isHovered ? "left-[-57%]" : "left-[-200%]"} ${
                       theme === "light"
-                        ? "bg-black text-white"
-                        : "bg-white text-black"
+                        ? "text-white bg-[#808080]"
+                        : "text-white bg-[#808080]"
                     } 
                     p-2 absolute  top-0 rounded border font-semibold cursor-pointer outline-none`}
                     value={language}

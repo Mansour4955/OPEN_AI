@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import Typewriter from "react-typewriter-effect";
-import logo from "../images/artificial-intelligence.png";
+import logo from "../images/uir.jpg";
 import { IoPersonCircleOutline } from "react-icons/io5";
 import { RxCopy, RxReload } from "react-icons/rx";
 import { PiCopySimpleFill, PiCopySimpleLight } from "react-icons/pi";
@@ -14,6 +14,10 @@ const Chat = ({
   setConversation,
   setTheLoading,
   setLoading,
+  setTyping,
+  typing,
+  setValue,
+  value,
 }) => {
   const [fill, setFill] = useState(false);
   const [reload, setReload] = useState(false);
@@ -21,6 +25,14 @@ const Chat = ({
   const { mode } = useSelector((state) => state.themode);
   const [theLight, setTheLight] = useState(mode);
   const bottomRef = useRef(null);
+  useEffect(() => {
+    const textLength = value?.length;
+    const typingDuration = textLength * 20; // Adjust the multiplier based on your typing speed
+    setTimeout(() => {
+      setTyping(false);
+      setTheLoading(false);
+    }, typingDuration);
+  }, [value]);
   useEffect(() => {
     setTheLight(mode);
   }, [mode]);
@@ -42,6 +54,7 @@ const Chat = ({
   };
 
   const handleReloadActiveChat = () => {
+    setLoading(true)
     setTheLoading(true);
     setReload(true);
     let userQuestion;
@@ -67,9 +80,11 @@ const Chat = ({
       })
       .then((res) => {
         console.log(res.data.result);
+        setTyping(true);
         setLoading(false);
 
         setReload(false);
+        setValue(res.data.result.answer.answerContent);
         setActiveChat((prev) => ({
           ...prev,
           messages: [
@@ -97,6 +112,7 @@ const Chat = ({
   };
 
   const handleReloadConversation = () => {
+    setLoading(true)
     setTheLoading(true);
     setReload(true);
     let userQuestion;
@@ -122,8 +138,9 @@ const Chat = ({
       })
       .then((res) => {
         console.log(res.data.result);
+        setTyping(true);
         setLoading(false);
-
+        setValue(res.data.result.answer.answerContent);
         // question.questionContent
         //answer.answerContent
         setReload(false);
@@ -166,7 +183,7 @@ const Chat = ({
               ) : (
                 <p className="font-bold flex flex-col text-lg">
                   <span className="flex gap-1 items-center">
-                    <img alt="logo" src={logo} className="w-9 h-9" />
+                    <img alt="logo" src={logo} className="w-7 h-7 rounded-full" />
                     Azul AI
                   </span>{" "}
                   <span
@@ -180,7 +197,6 @@ const Chat = ({
                         typeSpeed={20}
                         hideCursorAfterText={true}
                         cursorColor="white"
-                        onTypingEnd={() => setTheLoading(false)}
                       />
                     ) : (
                       msg.text
@@ -239,7 +255,7 @@ const Chat = ({
             ) : (
               <p className="font-bold flex flex-col text-lg">
                 <span className="flex gap-1 items-center text-[#808080]">
-                  <img alt="logo" src={logo} className="w-9 h-9" />
+                  <img alt="logo" src={logo} className="w-7 h-7 rounded-full" />
                   Azul AI
                 </span>{" "}
                 <span
@@ -252,7 +268,6 @@ const Chat = ({
                     typeSpeed={20}
                     hideCursorAfterText={true}
                     cursorColor="white"
-                    onTypingEnd={() => setTheLoading(false)}
                   />
                 </span>
                 {conversation.length - 1 === index && (
