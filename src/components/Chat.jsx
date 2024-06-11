@@ -6,6 +6,10 @@ import { RxCopy, RxReload } from "react-icons/rx";
 import { PiCopySimpleFill, PiCopySimpleLight } from "react-icons/pi";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import Answer from "./Answer";
+// import { marked } from "https://cdn.jsdelivr.net/npm/marked/lib/marked.esm.js";
+// import { marked } from "marked";
+// import Markdown from "react-markdown";
 
 const Chat = ({
   activeChat,
@@ -24,6 +28,7 @@ const Chat = ({
   const { lang } = useSelector((state) => state.options);
   const { mode } = useSelector((state) => state.themode);
   const [theLight, setTheLight] = useState(mode);
+  const [writting, setWritting] = useState(null);
   const bottomRef = useRef(null);
   useEffect(() => {
     const textLength = value?.length;
@@ -54,7 +59,7 @@ const Chat = ({
   };
 
   const handleReloadActiveChat = () => {
-    setLoading(true)
+    setLoading(true);
     setTheLoading(true);
     setReload(true);
     let userQuestion;
@@ -112,7 +117,7 @@ const Chat = ({
   };
 
   const handleReloadConversation = () => {
-    setLoading(true)
+    setLoading(true);
     setTheLoading(true);
     setReload(true);
     let userQuestion;
@@ -156,6 +161,22 @@ const Chat = ({
   // const handleStop=()=>{
   //   console.log("end")
   // }
+  // Render message with Markdown and Typewriter effect
+  // const renderMarkdownTypewriter = (text) => {
+  //   // return (
+  //   // <Typewriter
+  //   //   text={
+  //     setTimeout(() => {
+  //       setWritting(<Markdown>{text}</Markdown>);
+  //     console.log("writting ", writting);
+  //     }, 2000);
+  //   // }
+  //   //   typeSpeed={10}
+  //   //   hideCursorAfterText={true}
+  //   // />
+  //   // );
+  // };
+
   return (
     <div className="mb-4 w-full max-w-full">
       {/* Conversation Component */}
@@ -183,7 +204,11 @@ const Chat = ({
               ) : (
                 <p className="font-bold flex flex-col text-lg">
                   <span className="flex gap-1 items-center">
-                    <img alt="logo" src={logo} className="w-7 h-7 rounded-full" />
+                    <img
+                      alt="logo"
+                      src={logo}
+                      className="w-7 h-7 rounded-full"
+                    />
                     Azul AI
                   </span>{" "}
                   <span
@@ -191,13 +216,15 @@ const Chat = ({
                       theLight === "light" ? "text-black" : "text-white"
                     } pl-2 font-medium text-base`}
                   >
+                    {/* {renderMarkdownTypewriter(msg.text)} */}
                     {activeChat.messages.length - 1 === index ? (
-                      <Typewriter
-                        text={msg.text}
-                        typeSpeed={20}
-                        hideCursorAfterText={true}
-                        cursorColor="white"
-                      />
+                      // <Typewriter
+                      //   text={writting}
+                      //   typeSpeed={20}
+                      //   hideCursorAfterText={true}
+                      //   cursorColor="white"
+                      // />
+                      <Answer q={msg.text} />
                     ) : (
                       msg.text
                     )}
@@ -263,12 +290,14 @@ const Chat = ({
                     theLight === "light" ? "text-black" : "text-white"
                   } pl-2 flex flex-wrap font-medium text-base`}
                 >
-                  <Typewriter
-                    text={msg.text}
+                  {/* {renderMarkdownTypewriter(msg.text)} */}
+                  {/* <Typewriter
+                    text={writting}
                     typeSpeed={20}
                     hideCursorAfterText={true}
                     cursorColor="white"
-                  />
+                  /> */}
+                  <Answer q={msg.text} />
                 </span>
                 {conversation.length - 1 === index && (
                   <span className="pl-2 flex items-center gap-1 mt-1">
