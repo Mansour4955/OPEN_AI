@@ -4,28 +4,32 @@ import Footer from "../components/Footer";
 import { FaCode } from "react-icons/fa";
 import { TbArrowsMoveVertical } from "react-icons/tb";
 // import Typewriter from "react-typewriter-effect";
-import logo from "../images/artificial-intelligence.png";
+import logo from "../images/uir.jpg";
+import { MdOutlineLanguage } from "react-icons/md";
 import { BsFillChatFill } from "react-icons/bs";
 import { chats, questions } from "../data";
 import Slider from "react-slick";
 import ChatTitLe from "../components/ChatTitLe";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-
+import { FaSquare } from "react-icons/fa";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import {
   MdOutlineArrowBackIosNew,
   MdOutlineArrowForwardIos,
 } from "react-icons/md";
 import Chat from "../components/Chat";
 import axios from "axios";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setLang, setLangUser } from "../redux/optionsSlice";
 const Home = () => {
+  const [loading, setLoading] = useState(false);
   const { lang, langUser } = useSelector((state) => state.options);
   const { mode } = useSelector((state) => state.themode);
   const [userQuestion, setUserQuestion] = useState("");
   const [open, setOpen] = useState(false);
   const [openSide, setOpenSide] = useState(true);
-
+  const [language, setLanguage] = useState(lang);
   const [answers, setAnswers] = useState({});
   const [conversation, setConversation] = useState([]);
   const [clickedQuestions, setClickedQuestions] = useState([]);
@@ -33,6 +37,11 @@ const Home = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [theme, setTheme] = useState(mode);
   const [theLang, setTheLang] = useState(langUser);
+  const [showLangs, setShowLangs] = useState(false);
+  const [theLoading, setTheLoading] = useState(false);
+  useEffect(() => {
+    setLanguage(lang);
+  }, [lang]);
   useEffect(() => {
     setTheLang(langUser);
   }, [langUser]);
@@ -46,9 +55,7 @@ const Home = () => {
 
   // Function to handle mouse leave event
   const handleMouseLeave = () => {
-    setTimeout(() => {
-      setIsHovered(false);
-    }, 5000);
+    setIsHovered(false);
   };
   // const openAI = {
   //   ask: async (question) => {
@@ -58,6 +65,7 @@ const Home = () => {
   // };
 
   const handleQuestionClick = (question) => {
+    setTheLoading(true);
     setConversation((prevConversation) => [
       ...prevConversation,
       { type: "user", text: question },
@@ -76,6 +84,8 @@ const Home = () => {
         },
       })
       .then((res) => {
+        setLoading(false);
+        
         console.log(res.data.result);
         setConversation((prevConversation) => [
           ...prevConversation,
@@ -97,8 +107,10 @@ const Home = () => {
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
     // Check if there's an active chat
     if (activeChat) {
+      setTheLoading(true);
       setActiveChat((prev) => ({
         ...prev,
         messages: [...prev.messages, { type: "user", text: userQuestion }],
@@ -117,6 +129,8 @@ const Home = () => {
           },
         })
         .then((res) => {
+          setLoading(false);
+          
           console.log(res.data.result);
 
           setActiveChat((prev) => ({
@@ -134,6 +148,7 @@ const Home = () => {
           console.log(err);
         });
     } else {
+      setTheLoading(true);
       setConversation((conversation) => [
         ...conversation,
         { type: "user", text: userQuestion },
@@ -153,6 +168,8 @@ const Home = () => {
         })
         .then((res) => {
           console.log(res.data.result);
+          setLoading(false);
+         
           // question.questionContent
           //answer.answerContent
           setConversation((conversation) => [
@@ -199,14 +216,15 @@ const Home = () => {
       handleSubmit();
     }
   };
-  // const settings = {
-  //   dots: false,
-  //   autoplay: true,
-  //   infinite: true,
-  //   speed: 500,
-  //   slidesToShow: 3,
-  //   slidesToScroll: 1,
-  // };
+  const handleStop = () => {
+    console.log("STOP");
+  };
+  const dispatch = useDispatch();
+  const handleLanguageChange = (selectedLanguage) => {
+    setLanguage(selectedLanguage);
+    dispatch(setLang(selectedLanguage));
+    setShowLangs(false);
+  };
   return (
     <div
       className={`${
@@ -224,13 +242,15 @@ const Home = () => {
           dir={theLang === "arabic" ? "rtl" : ""}
           className={` ${
             !openSide ? "w-[0%]" : "w-[20%] h-[92.5vh]  px-1"
-          }  flex relative flex-col gap-4  transition-all duration-200 ${
-            theme === "light" ? "bg-[#808080]/70" : "bg-[#808080]/70"
+          }  flex relative flex-col gap-4 border-t-[2px]  transition-all duration-200 ${
+            theme === "light"
+              ? "bg-[#808080] border-t-white"
+              : "bg-[#808080] border-t-black"
           }`}
         >
           <p
             className={`${!openSide && "hidden"} text-2xl p-2 font-semibold ${
-              theme === "light" ? "text-white" : "text-white"
+              theme === "light" ? "text-white" : "text-black"
             } `}
           >
             {theLang === "english"
@@ -247,6 +267,7 @@ const Home = () => {
             {chats.map((chat) => (
               <div key={chat.id}>
                 <ChatTitLe
+                  theme={theme}
                   title={chat.title}
                   onTitleClick={() => handleTitleClick(chat)}
                 />
@@ -316,34 +337,42 @@ const Home = () => {
             !openSide ? " w-[70%]" : "w-[70%]"
           } flex flex-col items-center p-10 mx-auto`}
         >
-          <header
-            className={`${
-              clickedQuestions === questions ? "hidden" : "flex"
-            } text-4xl text-blue-600 font-bold mb-4  items-center gap-1 absolute top-[200px] left-2/4 -translate-x-2/4`}
-          >
-            <img alt="logo" src={logo} className="w-9 h-9" />
-            <span className="flex items-center text-[#808080] ">Ask Azul AI</span>
-            <img alt="logo" src={logo} className="w-9 h-9" />
-          </header>
+          <div className="w-full relative justify-center items-center">
+            <header
+              className={`${
+                clickedQuestions === questions ? "hidden" : "flex"
+              } text-4xl text-blue-600 flex-col font-bold mb-4 items-center gap-1 absolute top-[120px] left-2/4 -translate-x-2/4`}
+            >
+              <img alt="logo" src={logo} className="w-11 h-11 rounded-full" />
+              <span className="text-[#808080] ">
+                {theLang === "french"
+                  ? "Demandez à Azul AI"
+                  : theLang === "english"
+                  ? "Ask Azul AI"
+                  : "إسأل أزول إ أي"}
+              </span>
+              {/* <img alt="logo" src={logo} className="w-9 h-9" /> */}
+            </header>
+          </div>
 
           <div className="h-[70vh] max-h-[70vh] relative overflow-y-auto w-full">
             {clickedQuestions.length < 1 && (
               <div className="w-[80%] mx-auto grid grid-cols-2 gap-2 absolute bottom-20 left-2/4 -translate-x-2/4">
                 {/* <Slider {...settings} className="flex gap-5"> */}
-                  {visibleQuestions.map((question, index) => (
-                    <div
-                      key={index}
-                      onClick={() => handleQuestionClick(question)}
-                      className={`text-white cursor-pointer  col-span-1 duration-150 flex  bg-[#808080] rounded-lg   px-4 py-2 slick-slide-custom`}
-                    >
-                     <div className="flex flex-col">
-                     <label className=" text-base  duration-150 font-medium flex cursor-pointer line-clamp-1">
+                {visibleQuestions.map((question, index) => (
+                  <div
+                    key={index}
+                    onClick={() => handleQuestionClick(question)}
+                    className={`text-white cursor-pointer  col-span-1 duration-150 flex  bg-[#808080] rounded-lg hover:bg-[#808080]/80  px-4 py-2 slick-slide-custom`}
+                  >
+                    <div className="flex flex-col">
+                      <label className=" text-base  duration-150 font-medium flex cursor-pointer line-clamp-1">
                         {question}
                       </label>
-                      <p className="line-clamp-1">ssssssssssssssssssssssssss</p>
-                     </div>
+                      {/* <p className="line-clamp-1">ssssssssssssssssssssssssss</p> */}
                     </div>
-                  ))}
+                  </div>
+                ))}
                 {/* </Slider> */}
               </div>
             )}
@@ -352,54 +381,117 @@ const Home = () => {
               setActiveChat={setActiveChat}
               setConversation={setConversation}
               conversation={conversation}
+              setTheLoading={setTheLoading}
+              setLoading={setLoading}
             />
           </div>
           <div className="mx-auto flex gap-2 ltr w-[80%]">
-            <div
-              onClick={handleNewChat}
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
-              className={`${
-                !isHovered ? "w-[50px] px-2 py-1" : "w-[170px] p-2 gap-1"
-              }  cursor-pointer duration-200 transition-all flex justify-center items-center h-fit rounded-lg  bg-[#808080]`}
-            >
-              <span className="relative text-white">
-                <BsFillChatFill size={36} />
-                <span className="absolute right-1 bottom-1 text-[#808080] font-semibold text-xl">
-                  +
-                </span>
-              </span>
-              <span
+            <div className="flex flex-col gap-2">
+              <div
+                onClick={handleNewChat}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
                 className={`${
-                  isHovered ? "flex" : "hidden"
-                }whitespace-nowrap overflow-x-hidden  font-semibold ${
-                  theme === "light" ? "text-white" : "text-white"
-                }`}
+                  !isHovered ? "w-[50px] px-2 py-1" : "w-[170px] p-2 gap-1"
+                }  cursor-pointer duration-200 transition-all flex justify-center items-center h-fit rounded-lg  bg-[#808080]`}
               >
-                New Chat
-              </span>
+                <span className="relative text-white">
+                  <BsFillChatFill size={36} />
+                  <span className="absolute right-1 bottom-1 text-[#808080] font-semibold text-xl">
+                    +
+                  </span>
+                </span>
+                <span
+                  className={`${
+                    isHovered ? "flex" : "hidden"
+                  }whitespace-nowrap overflow-x-hidden  font-semibold ${
+                    theme === "light" ? "text-white" : "text-white"
+                  }`}
+                >
+                  New Chat
+                </span>
+              </div>
+              <div className="relative">
+                <span
+                  onClick={() => setShowLangs(!showLangs)}
+                  className={`${
+                    !isHovered ? " px-2 py-1 " : "  px-2 py-1"
+                  } text-white cursor-pointer duration-200 transition-all flex justify-center w-[50px] items-center h-fit rounded-lg  bg-[#808080]`}
+                >
+                  <MdOutlineLanguage size={36} />
+                  {/* <span className="absolute right-1 bottom-1 text-[#808080] font-semibold text-xl">
+                  +
+                </span> */}
+                </span>
+                {showLangs && (
+                  <select
+                    className={`${isHovered ? "left-[-57%]" : "left-[-200%]"} ${
+                      theme === "light"
+                        ? "bg-black text-white"
+                        : "bg-white text-black"
+                    } 
+                    p-2 absolute  top-0 rounded border font-semibold cursor-pointer outline-none`}
+                    value={language}
+                    onChange={(e) => handleLanguageChange(e.target.value)}
+                  >
+                    <option value="english">English</option>
+                    <option value="french">French</option>
+                    <option value="arabic">Arabic</option>
+                  </select>
+                )}
+              </div>
             </div>
             <div className=" w-full ">
               <div className="flex relative">
                 <textarea
+                  dir={theLang === "arabic" ? "rtl" : ""}
                   rows={4}
                   type="text"
                   className={`${
                     theme === "light"
                       ? "text-black caret-black"
                       : "text-white caret-white"
-                  } bg-transparent flex-1 border-[2px] font-medium  border-[#808080] rounded-xl px-2 outline-none py-3`}
-                  placeholder="Ask Azul AI"
+                  } ${
+                    theLang === "arabic" ? "pr-2 pl-10" : "pl-2 pr-10"
+                  } bg-transparent flex-1 border-[2px] font-medium  border-[#808080] rounded-xl outline-none py-3`}
+                  placeholder={
+                    theLang === "french"
+                      ? "Demandez à Azul AI"
+                      : theLang === "english"
+                      ? "Ask Azul AI"
+                      : "إسأل أزول إ أي"
+                  }
                   value={userQuestion}
                   onChange={handleUserQuestionChange}
                   onKeyDown={handleKeyDown}
                 />
-                <div
-                  onClick={handleSubmit}
-                  className="bg-[#808080] absolute top-2 right-2 hover:bg-gray-500 flex items-center justify-center rounded-lg px-2 py-1 text-white font-bold cursor-pointer duration-300"
-                >
-                  <IoIosSend size={20} />
-                </div>
+                {!theLoading ? (
+                  <div
+                    onClick={handleSubmit}
+                    className={`${
+                      theLang === "arabic" ? "left-2" : "right-2"
+                    } bg-[#808080] absolute top-2  hover:bg-gray-500 flex items-center justify-center rounded-lg px-2 py-1 text-white font-bold cursor-pointer duration-300`}
+                  >
+                    <IoIosSend size={20} />
+                  </div>
+                ) : theLoading && loading ? (
+                  <div
+                    className={`${
+                      theLang === "arabic" ? "left-2" : "right-2"
+                    } bg-[#808080] absolute top-2 hover:bg-gray-500 flex items-center justify-center rounded-full p-1  text-white font-bold cursor-pointer duration-300 animate-spin`}
+                  >
+                    <AiOutlineLoading3Quarters size={18} />
+                  </div>
+                ) : (
+                  <div
+                    onClick={handleStop}
+                    className={`${
+                      theLang === "arabic" ? "left-2" : "right-2"
+                    } bg-[#808080] absolute top-2 hover:bg-gray-500 flex items-center justify-center rounded-lg px-2 py-1 text-white font-bold cursor-pointer duration-300`}
+                  >
+                    <FaSquare size={18} />
+                  </div>
+                )}
               </div>
             </div>
           </div>

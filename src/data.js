@@ -1,9 +1,10 @@
 export const questions = [
-  "What is your favorite color?",
-  "What is your favorite food?",
-  "What is your favorite movie?",
-  "What is your favorite hobby?",
+  "What color schemes do you find most visually appealing?",
+  "What cuisine do you enjoy the most?",
+  "Do you have any favorite films or genres that particularly resonate with you?",
+  "What activities do you find most fulfilling and engaging in your free time?"
 ];
+
 
 export const chats = [
   {

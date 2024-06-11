@@ -7,9 +7,14 @@ import { PiCopySimpleFill, PiCopySimpleLight } from "react-icons/pi";
 import axios from "axios";
 import { useSelector } from "react-redux";
 
-const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
-  
-  
+const Chat = ({
+  activeChat,
+  setActiveChat,
+  conversation,
+  setConversation,
+  setTheLoading,
+  setLoading,
+}) => {
   const [fill, setFill] = useState(false);
   const [reload, setReload] = useState(false);
   const { lang } = useSelector((state) => state.options);
@@ -37,6 +42,7 @@ const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
   };
 
   const handleReloadActiveChat = () => {
+    setTheLoading(true);
     setReload(true);
     let userQuestion;
     const theLastUserMessage = activeChat.messages.filter(
@@ -61,6 +67,8 @@ const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
       })
       .then((res) => {
         console.log(res.data.result);
+        setLoading(false);
+
         setReload(false);
         setActiveChat((prev) => ({
           ...prev,
@@ -89,6 +97,7 @@ const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
   };
 
   const handleReloadConversation = () => {
+    setTheLoading(true);
     setReload(true);
     let userQuestion;
     const theLastUserMessage = conversation.filter(
@@ -113,6 +122,8 @@ const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
       })
       .then((res) => {
         console.log(res.data.result);
+        setLoading(false);
+
         // question.questionContent
         //answer.answerContent
         setReload(false);
@@ -125,6 +136,9 @@ const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
         console.log(err);
       });
   };
+  // const handleStop=()=>{
+  //   console.log("end")
+  // }
   return (
     <div className="mb-4 w-full max-w-full">
       {/* Conversation Component */}
@@ -166,6 +180,7 @@ const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
                         typeSpeed={20}
                         hideCursorAfterText={true}
                         cursorColor="white"
+                        onTypingEnd={() => setTheLoading(false)}
                       />
                     ) : (
                       msg.text
@@ -237,6 +252,7 @@ const Chat = ({ activeChat, setActiveChat, conversation, setConversation }) => {
                     typeSpeed={20}
                     hideCursorAfterText={true}
                     cursorColor="white"
+                    onTypingEnd={() => setTheLoading(false)}
                   />
                 </span>
                 {conversation.length - 1 === index && (
