@@ -4,6 +4,7 @@ import uir from "../images/uir.jpg";
 import { useDispatch, useSelector } from "react-redux";
 import { setLangUser } from "../redux/optionsSlice";
 import { setMode } from "../redux/modeSlice";
+import { IoPersonCircleOutline } from "react-icons/io5";
 import {
   MdDarkMode,
   MdOutlineDarkMode,
@@ -134,6 +135,18 @@ function Header() {
               <MdOutlineDarkMode size={28} />
             </span>
           )}
+        </div>
+        <div
+          className={` rounded-full flex items-center gap-1 p-1 cursor-pointer  duration-150 ${
+            theLight === "light"
+              ? "text-black bg-white "
+              : " text-white bg-black"
+          }`}
+        >
+          <span>
+            <IoPersonCircleOutline size={30} />
+          </span>
+          <span className="font-semibold pr-1">Unknown</span>
         </div>
       </div>
     </div>
