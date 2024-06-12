@@ -20,7 +20,7 @@ function App() {
   return (
     <div
       // dir={theLang === "arabic" ? "rtl" : "ltr"}
-      className="bg-white h-screen "
+      className="bg-[#808080] h-screen "
     >
       <BrowserRouter>
         <Header />

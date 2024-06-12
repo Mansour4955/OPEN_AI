@@ -146,7 +146,7 @@ function Header() {
           <span>
             <IoPersonCircleOutline size={30} />
           </span>
-          <span className="font-semibold pr-1">Unknown</span>
+          <span className="font-semibold pr-1">Mansour</span>
         </div>
       </div>
     </div>

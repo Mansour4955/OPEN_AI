@@ -191,7 +191,7 @@ const Chat = ({
               {msg.type === "user" ? (
                 <p className="font-bold flex flex-col text-lg">
                   <span className="flex gap-1 items-center">
-                    <IoPersonCircleOutline className="" size={28} /> You
+                    <IoPersonCircleOutline className="" size={28} /> Mansour
                   </span>{" "}
                   <span
                     className={`${
@@ -269,7 +269,7 @@ const Chat = ({
               <p className="font-bold flex flex-col text-lg">
                 <span className="flex gap-1 items-center text-[#808080]">
                   <IoPersonCircleOutline className="text-[#808080]" size={28} />{" "}
-                  You
+                  Mansour
                 </span>{" "}
                 <span
                   className={`${
