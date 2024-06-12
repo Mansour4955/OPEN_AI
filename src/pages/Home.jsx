@@ -10,6 +10,7 @@ import { BsFillChatFill } from "react-icons/bs";
 import { chats, questions } from "../data";
 import Slider from "react-slick";
 import ChatTitLe from "../components/ChatTitLe";
+import { RiTranslate2 } from "react-icons/ri";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { FaSquare } from "react-icons/fa";
@@ -428,7 +429,7 @@ const Home = () => {
                     !isHovered ? " px-2 py-1 " : "  px-2 py-1"
                   } text-white cursor-pointer duration-200 transition-all flex justify-center w-[50px] items-center h-fit rounded-lg  bg-[#808080]`}
                 >
-                  <MdOutlineLanguage size={36} />
+                  <RiTranslate2 size={30} />
                   {/* <span className="absolute right-1 bottom-1 text-[#808080] font-semibold text-xl">
                   +
                 </span> */}
